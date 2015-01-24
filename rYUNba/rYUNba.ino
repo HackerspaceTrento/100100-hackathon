@@ -10,12 +10,13 @@ const int LS = A0;
 //#define ALTITUDE 150.0
 Adafruit_BMP085 bmp;
 
-
+int ledPin1=8,ledPin2=9;
 
 //Yun
 #include <Process.h>
 Process nodejs;    // make a new Process for calling Node
-Process video;    // make a new Process for calling Node
+//Process video;    // make a new Process for calling Node
+Process waitip;    // make a new Process for waiting successful ping
 
 
 //Roomba
@@ -43,6 +44,9 @@ void setup() {
   Serial.println("On...");
 
   delay(1000);
+
+  pinMode(ledPin1,  OUTPUT);   // sets the pins as output
+  pinMode(ledPin2,  OUTPUT);   // sets the pins as output
 
   pinMode(ddPin,  OUTPUT);   // sets the pins as output
   sciSerial.begin(19200); //talking to Roomba over 19200, remember to set Roomba to 19200
@@ -78,16 +82,22 @@ void setup() {
   Serial.println("done Roomba initial test!");
 
 
+  delay(70000);
   //OK do Yun stuff now:
   Bridge.begin(); // Initialize the Bridge
 
   // launch the video server script asynchronously:
-  video.runShellCommandAsynchronously("/mnt/sda1/arduino/bin/captureVideo.sh");
-  Serial.println("Started video process");
+  //video.runShellCommandAsynchronously("/mnt/sda1/arduino/bin/captureVideo.sh");
+  //Serial.println("Started video process");
+
+  // launch the ip ping script synchronously:
+  waitip.runShellCommand("/mnt/sda1/arduino/bin/waitip.sh");
+  digitalWrite(ledPin1, HIGH);
+  digitalWrite(ledPin2, HIGH);
 
   // launch the ws client script asynchronously:
-  nodejs.runShellCommandAsynchronously("node /mnt/sda1/arduino/node/wsclient2.js");
-  Serial.println("Started ws process");
+  nodejs.runShellCommandAsynchronously("/mnt/sda1/arduino/bin/run_scripts.sh");
+  Serial.println("Started processes");
 
   goForward();
   delay(1000);
