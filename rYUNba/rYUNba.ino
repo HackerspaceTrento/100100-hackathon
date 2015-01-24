@@ -68,14 +68,12 @@ void setup() {
   delay(500);
   goBackward();
   delay(2000);
-  stopMoving();
-  delay(800);
-  spinLeft();
+  
+  driveDirect(-300 , 300);                   
   delay(1000);
-  stopMoving();
-  spinRight();
+  driveDirect(300 , -300);
   delay(1000);
-  stopMoving();
+  driveDirect(0, 0);
 
   Serial.println("done Roomba initial test!");
 
@@ -177,15 +175,15 @@ void checkCommand(int comm) {
       stopMoving();
       break;
     case 3:
-      spinRight();
-      delay(1000);
-      stopMoving();
-      break;
-    case 4:
-      spinLeft();
-      delay(1000);
-      stopMoving();
-      break;
+     driveDirect(-300 , 300);                   
+     delay(1000);
+     driveDirect(0,0);
+     break;
+   case 4:
+     driveDirect(300 , -300);                   
+     delay(1000);
+     driveDirect(0,0);
+     break;
     case 5:
       goBackward();
       delay(1000);
@@ -249,5 +247,14 @@ void roombaPowerOn() {
 void roombaClean() {
   sciSerial.write(135);
   delay(50);
+}
+
+void driveDirect(int16_t leftVelocity, int16_t rightVelocity)
+{
+  sciSerial.write(145);
+  sciSerial.write((rightVelocity & 0xff00) >> 8);
+  sciSerial.write(rightVelocity & 0xff);
+  sciSerial.write((leftVelocity & 0xff00) >> 8);
+  sciSerial.write(leftVelocity & 0xff);
 }
 
