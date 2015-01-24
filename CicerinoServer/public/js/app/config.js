@@ -2,7 +2,7 @@ define(function() {
 
     var config = {};
 
-    config.baseUrl = 'http://10.100.250.87:1337';
+    config.baseUrl = 'http://10.100.249.72:1337';
 
     config.roomba = {
         baseUrl: config.baseUrl + '/control/roomba'
