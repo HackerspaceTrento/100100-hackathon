@@ -114,7 +114,7 @@ void loop() {
     sound_array[audio_counter] = analogRead(A1);
     audio_counter++;
   }
-  if ((millis() - lastSensing) > 1000) {
+  if ((millis() - lastSensing) > 10000) {
     /*
     Serial.print(readLS());
     Serial.print("   ");
