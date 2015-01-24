@@ -1,0 +1,19 @@
+{
+  "name": "cicerino-ui",
+  "version": "0.0.0",
+  "authors": [
+    "Luca Capra <luca.capra@gmail.com>"
+  ],
+  "moduleType": [
+    "amd"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
