@@ -2,12 +2,12 @@
 #include <SFE_BMP180.h>
 #include <Adafruit_BMP085.h>
 #include <Wire.h>
-const int audio_samples=100;
-int audio_counter=0;
+const int audio_samples = 100;
+int audio_counter = 0;
 int sound_array[audio_samples];
 const int LS = A0;
-SFE_BMP180 pressure;
-#define ALTITUDE 150.0
+//SFE_BMP180 pressure;
+//#define ALTITUDE 150.0
 Adafruit_BMP085 bmp;
 
 
@@ -27,64 +27,62 @@ int txPin_nss = 4;
 
 int ddPin = 5;  // pin needed for waking Rommba up
 
-SoftwareSerial sciSerial(rxPin_nss,txPin_nss);
+SoftwareSerial sciSerial(rxPin_nss, txPin_nss);
 
 uint8_t stopvar = 0x00;
-long lastSensing=0;
+long lastSensing = 0;
 
 char buf[20];
 
 
 void setup() {
+  // put your setup code here, to run once:
+
+
   Serial.begin(9600);
-  Serial.println("Starting...");
+  Serial.println("On...");
 
   delay(1000);
-  //Sensors init
-  if (!bmp.begin()) {
-    Serial.println("BMP180 init fail\n\n");
-  }
-  /*
-  if (pressure.begin()) {
-    Serial.println("BMP180 init success");
-  } else {
-    Serial.println("BMP180 init fail\n\n");
-  }
-  */
- 
-  //Roomba stuff
-  delay(1000);
+
   pinMode(ddPin,  OUTPUT);   // sets the pins as output
   sciSerial.begin(19200); //talking to Roomba over 19200, remember to set Roomba to 19200
 
-  // set up ROI to receive commands  
+
+  // set up ROI to receive commands
   sciSerial.write(128);  // START
   delay(50);
   sciSerial.write(130);  // CONTROL
   delay(50);
 
-  Serial.println("checking roomba now");  
+
+
+  //Sensors:
+  if (!bmp.begin()) {
+    Serial.println("BMP180 init fail\n\n");
+  }
+
+  Serial.println("checking roomba now");
   goForward();
-  delay(1000);
+  delay(2000);
   stopMoving();
   delay(500);
   goBackward();
-  delay(1000);
+  delay(2000);
   stopMoving();
-  delay(500);
+  delay(800);
   spinLeft();
   delay(1000);
   stopMoving();
-  delay(500);
   spinRight();
   delay(1000);
   stopMoving();
-  Serial.println("done Roomba initial test!");
-  
 
-  //Yun stuff now:
+  Serial.println("done Roomba initial test!");
+
+
+  //OK do Yun stuff now:
   Bridge.begin(); // Initialize the Bridge
-  
+
   // launch the video server script asynchronously:
   video.runShellCommandAsynchronously("/mnt/sda1/arduino/bin/captureVideo.sh");
   Serial.println("Started video process");
@@ -92,9 +90,7 @@ void setup() {
   // launch the ws client script asynchronously:
   nodejs.runShellCommandAsynchronously("node /mnt/sda1/arduino/node/wsclient2.js");
   Serial.println("Started ws process");
-  
 
-  //Do another Roomba show to tell the system is ready:
   goForward();
   delay(1000);
   stopMoving();
@@ -110,140 +106,101 @@ void loop() {
     int cmd = (int)nodejs.read();
     checkCommand(cmd - 48);
   }
-  
+
   //sensor reading
-  if (audio_counter==audio_samples){
-    audio_counter=0;
+  if (audio_counter == audio_samples) {
+    audio_counter = 0;
   } else {
-    sound_array[audio_counter]=analogRead(A1);
+    sound_array[audio_counter] = analogRead(A1);
     audio_counter++;
   }
-  if ((millis()-lastSensing)>1000){
+  if ((millis() - lastSensing) > 1000) {
     /*
     Serial.print(readLS());
     Serial.print("   ");
     Serial.print(readP());
     Serial.print("   ");
     Serial.print(readT());
-    Serial.print("   ");    
+    Serial.print("   ");
     Serial.println(returnSound());
-    
+    */
+
     //make string
-    sprintf(buf, "%d, %f, %f, %d", readLS(), readP(), readT(), returnSound());
-    
+    /*
+    sprintf(buf, "%d, %d, %f, %d", readLS(), bmp.readPressure(), bmp.readTemperature(), returnSound());
+
     //send to Linux
     if (nodejs.running()) {
       String str = String(buf);
-      
       nodejs.println(str);
     }
     */
-    nodejs.print(readLS());
-    nodejs.print(", ");
-    nodejs.print(bmp.readPressure());
-    nodejs.print(", ");
-    nodejs.print(bmp.readTemperature());
-    nodejs.print(", ");
-    nodejs.println(returnSound());
-
-    lastSensing=millis();
-  }
-
-}
-
-
-int readLS(){return analogRead(A0);}
-
-double readT(){
-  char status;
-  double T;
-  //int returnarray=[T,P];
-
-  status = pressure.startTemperature();
-  if (status != 0)
-  {
-    // Wait for the measurement to complete:
-    delay(status);
-
-    status = pressure.getTemperature(T);
-    if (status != 0)
-    {
-     return T;
-    }
-    else Serial.println("error retrieving temperature measurement\n");
-  }
-  else Serial.println("error starting temperature measurement\n");
-
-}
-
-
-double readP(){
-  char status;
-  double P,T;
-  status = pressure.startPressure(3);
-  if (status != 0) {
-    // Wait for the measurement to complete:
-    delay(status);
-
-    status = pressure.getPressure(P,T);
-    if (status != 0)
     
-    {//double[] returnarray = {P,T};
-      return P;
-     //return returnarray;
-     //return P;
-    } else {
-      Serial.println("error retrieving pressure measurement\n");
+    if (nodejs.running()) {
+      nodejs.print(readLS());
+      nodejs.print(", ");
+      nodejs.print(bmp.readPressure());
+      nodejs.print(", ");
+      nodejs.print(bmp.readTemperature());
+      nodejs.print(", ");
+      nodejs.println(returnSound());
     }
-  } else {
-    Serial.println("error starting pressure measurement\n");
+
+    lastSensing = millis();
   }
+
 }
 
-int returnSound(){
-  int sum=0;
-  for (int a=0;a<audio_samples;a++){
-    sum=sum+sound_array[a];
+
+int readLS() {
+  return analogRead(A0);
+}
+
+
+int returnSound() {
+  int sum = 0;
+  for (int a = 0; a < audio_samples; a++) {
+    sum = sum + sound_array[a];
   }
-  return sum/audio_samples;
+  return sum / audio_samples;
 }
 
 
 void checkCommand(int comm) {
   switch (comm) {
-  case 1:
-    roombaPowerOn();
-    break;
-   case 2:
-     goForward();
-     delay(1000);
-     stopMoving();
-     break;
-   case 3:
-     spinRight();
-     delay(1000);
-     stopMoving();
-     break;
-   case 4:
-     spinLeft();
-     delay(1000);
-     stopMoving();
-     break;
-   case 5:
-     goBackward();
-     delay(1000);
-     stopMoving();
-     break;
-   case 0:
-     stopMoving();
-     break;
-     
-   case 10:
-     roombaClean();
-     break;
-   
+    case 1:
+      roombaPowerOn();
+      break;
+    case 2:
+      goForward();
+      delay(1000);
+      stopMoving();
+      break;
+    case 3:
+      spinRight();
+      delay(1000);
+      stopMoving();
+      break;
+    case 4:
+      spinLeft();
+      delay(1000);
+      stopMoving();
+      break;
+    case 5:
+      goBackward();
+      delay(1000);
+      stopMoving();
+      break;
+    case 0:
+      stopMoving();
+      break;
+
+    case 10:
+      roombaClean();
+      break;
+
   }
-} 
+}
 
 void goForward() {
   sciSerial.write(137);   // DRIVE
@@ -280,7 +237,7 @@ void stopMoving() {
   sciSerial.write(stopvar);
   sciSerial.write(stopvar);   // 0x0000
 }
-  
+
 void roombaPowerOn() {
   digitalWrite(ddPin, HIGH);
   delay(100);
