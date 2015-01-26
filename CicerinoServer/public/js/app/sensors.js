@@ -112,7 +112,7 @@ define([
 
                 canvasEl = $('#' + _canvasId);
                 chart.addTimeSeries(me.dataset[type], timeSeriesConf);
-                chart.streamTo(canvasEl[0], 1000);
+                chart.streamTo(canvasEl[0]);
 
 
                 $(window).on('resize', function() {
