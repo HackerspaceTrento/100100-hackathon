@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Cicerino</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/require.js" data-main="js/main"></script>
+        <link rel="stylesheet" href="js/lib/foundation/css/foundation.css" />
+        <style>
+
+            #videoCanvas {
+
+                width: 100%;
+                height: auto;
+
+            }
+
+            #btn-bar {
+                bottom: 0;
+                z-index: 999;
+                position: fixed;
+            }
+
+            #keyb-view {
+                position: relative;
+                top: 0px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div class="icon-bar five-up" id='btn-bar'>
+
+            <a class="item active" id='btn-video' data-type='webcam'>
+                <img src="img/webcam.svg" >
+                <label>Video</label>
+            </a>
+
+            <a class="item" id='btn-light' data-type='light'>
+                <img src="img/light.svg" >
+                <label>Light</label>
+            </a>
+
+            <a class="item" id='btn-temperature' data-type='temperature'>
+                <img src="img/temperature.svg" >
+                <label>Temperature</label>
+            </a>
+
+            <a class="item" id='btn-pressure' data-type='pressure'>
+                <img src="img/pressure.svg" >
+                <label>Pressure</label>
+            </a>
+
+            <a class="item" id='btn-sound' data-type='sound'>
+                <img src="img/sound.svg" >
+                <label>Sound</label>
+            </a>
+
+        </div>
+
+
+
+        <div class="off-canvas-wrap" data-offcanvas>
+            <div class="inner-wrap">
+
+<!--                <nav class="tab-bar">
+                    <section class="middle tab-bar-section">
+                        <h1 class="title">Cicerino</h1>
+                    </section>-->
+<!--                    <section class="right-small">
+                        <a class="right-off-canvas-toggle menu-icon" href="#"><span></span></a>
+                    </section>-->
+                <!--</nav>-->
+
+<!--                <aside class="right-off-canvas-menu">
+                    <ul class="off-canvas-list">
+                        <li><label>Users</label></li>
+                        <li><a href="#">Hari Seldon</a></li>
+                        <li><a href="#">...</a></li>
+                    </ul>
+                </aside>-->
+
+                <section class="main-section">
+
+                    <div class="row" id='video-view'>
+                        <div class="columns large-12 small-12 medium-12">
+
+                            <img id="videoCanvas"/>
+
+                        </div>
+                    </div>
+
+                    <div class="row" id='keyb-view'>
+                        <div class="columns large-12 small-12 medium-12">
+
+                            <table  style="margin: 0 auto">
+                                <tr></tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <img src='img/left.svg' style="transform: rotate(90deg);" class='btn-move' data-code='38'>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr></tr>
+                                <tr>
+                                    <td><img src='img/left.svg' class='btn-move' data-code='37'></td>
+                                    <td><img src='img/left.svg' style="transform: rotate(270deg);"  class='btn-move' data-code='40'></td>
+
+                                    <td><img src='img/left.svg' style="transform: rotate(180deg);"  class='btn-move' data-code='39'></td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+
+                    <div class="row" id='graph-view'>
+                        <div class="columns large-12 small-12 medium-12">
+
+                        </div>
+                    </div>
+
+                </section>
+
+                <a class="exit-off-canvas"></a>
+
+            </div>
+        </div>
+
+    </body>
+</html>
